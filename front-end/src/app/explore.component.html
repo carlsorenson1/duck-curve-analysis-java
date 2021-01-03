@@ -5,13 +5,18 @@
     <option *ngFor='let opt of displayModes' [value]='opt.value' [selected]='opt.value == displayMode'>{{opt.text}}</option>
   </select>
 
-  <div *ngIf='displayMode != "single";' style='display: inline-block; margin-top: 15px;'>
+  <div *ngIf='displayMode != "single";' class="headerblock">
     <button (click)='previousMonth();' [disabled]='startDate >= currentMonth'>&lt;</button> {{currentMonth|date:'MMMM yyyy':'+0000'}} <button (click)='nextMonth();' [disabled]='currentMonth >= endMonth'>&gt;</button>
   </div>
 
-  <div *ngIf='displayMode == "single";' style='display: inline; margin-left: 15px;'>
+  <div *ngIf='displayMode == "single";' class="headerblock">
     <button (click)='previousDay();'  [disabled]='startDate >= currentDate'>&lt;</button> {{currentDate|date:'EEEE, MMMM d, yyyy':'+0000'}} <button (click)='nextDay();' [disabled]='currentDate >= endDate'>&gt;</button>
   </div>
+
+  <div class="headerblock">
+    <strong>Options</strong>: Apply sample solar generation <input type="checkbox" [checked]="solarEnabled" (change)="solarEnabled = !solarEnabled"/>
+  </div>
+
   <br />
 
   <!-- Legend -->
@@ -48,32 +53,7 @@
         </text>
       </ng-container>
       <!-- Solar profile -->
-      <polyline [attr.points]='(14 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(0)) + ", "
-        + (15 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(150)) + ", "
-        + (16 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(450)) + ", "
-        + (17 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(1500)) + ", "
-        + (18 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(2500)) + ", "
-        + (19 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(3300)) + ", "
-        + (20 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(3600)) + ", "
-        + (21 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(3900)) + ", "
-        + (22 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(4100)) + ", "
-        + (23 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(4200)) + ", "
-        + (24 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(4250)) + ", "
-        + (25 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(4300)) + ", "
-        + (26 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(4350)) + ", "
-        + (27 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(4400)) + ", "
-        + (28 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(4400)) + ", "
-        + (29 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(4400)) + ", "
-        + (30 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(4200)) + ", "
-        + (31 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(3900)) + ", "
-        + (32 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(3300)) + ", "
-        + (33 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(2200)) + ", "
-        + (34 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(1500)) + ", "
-        + (35 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(450)) + ", "
-        + (36 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(180)) + ", "
-        + (37 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(100)) + ", "
-        + (38 * 25 + 65) + " " + (490 - wattsToPixelsMonthly(0))'
-        fill='none' stroke='gold' stroke-width='4' ></polyline>
+      <polyline *ngIf="solarEnabled" [attr.points]='solarLinePoints' fill='none' stroke='gold' stroke-width='4' ></polyline>
     </svg>
   </div>
 

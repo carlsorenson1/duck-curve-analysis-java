@@ -15,13 +15,17 @@ export class ExploreComponent implements OnInit {
   endMonth: Date;
 
   displayMode: string;
-  datapoints: any[];
+
+  datapoints: IDatapoint[];
+  solarDatapoints: IDatapoint[];
+  solarLinePoints: string;
+
   maxRampRateDown: number;
   maxRampRateUp: number;
   maxRampRateDownPercent: number;
   maxRampRateUpPercent: number;
 
-  oldLog: any;
+  solarEnabled = true;
 
   displayModes = [
     {value: 'weekdays', text: 'Weekday average'},
@@ -175,7 +179,21 @@ export class ExploreComponent implements OnInit {
     this.startDate = new Date('2020-10-01');
 
     this.displayMode = 'weekdays';
+
+    this.energyDataService.getSolarValues()
+      .subscribe( solarValues => {
+          this.solarDatapoints = solarValues;
+          this.solarLinePoints = '';
+          for (let i = 14; i < 39; i++){
+            this.solarLinePoints +=
+              (i * 25 + 65) + ' ' + (490 - this.wattsToPixelsMonthly(this.solarDatapoints[i].averagePowerWatts)) + ',';
+          }
+          this.solarLinePoints = this.solarLinePoints.slice(0, -1);
+        },
+        error => {
+          this.log(error);
+        });
+
     this.updateDatapoints();
   }
-
 }
