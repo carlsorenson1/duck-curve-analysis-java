@@ -17,6 +17,7 @@ export class ExploreComponent implements OnInit {
   displayMode: string;
 
   datapoints: IDatapoint[];
+  calculatedDatapoints: IDatapoint[];
   solarDatapoints: IDatapoint[];
   solarLinePoints: string;
 
@@ -50,6 +51,14 @@ export class ExploreComponent implements OnInit {
 
   wattsToPixelsSingle(watts: number, pxOffset: number = 0): number {
     return watts / 40 + pxOffset;
+  }
+
+  abs(value: number): number {
+    return Math.abs(value);
+  }
+
+  max(value1: number, value2: number): number {
+    return Math.max(value1, value2);
   }
 
   previousMonth(): void {
@@ -113,9 +122,8 @@ export class ExploreComponent implements OnInit {
     case 'all':
         this.energyDataService.getEnergyAverages(this.displayMode, this.currentMonth)
         .subscribe( datapoints => {
-            this.log('Got averages: ' + datapoints.length);
             this.datapoints = datapoints;
-            this.calculateRampRates(datapoints);
+            this.recalculateDatapoints();
           },
             error => {
               this.log(error);
@@ -124,9 +132,8 @@ export class ExploreComponent implements OnInit {
     case 'single':
         this.energyDataService.getEnergyForDate(this.currentDate)
         .subscribe( datapoints => {
-            this.log('Got day values: ' + datapoints.length);
             this.datapoints = datapoints;
-            this.calculateRampRates(datapoints);
+            this.recalculateDatapoints();
         },
           error => {
             this.log(error);
@@ -136,28 +143,44 @@ export class ExploreComponent implements OnInit {
     }
   }
 
-  calculateRampRates(datapoints: IDatapoint[]): void {
+  recalculateDatapoints(): void {
+    if (this.calculatedDatapoints == null) {
+      this.calculatedDatapoints = new Array<IDatapoint>(48);
+      for (let i = 0; i < 48; i++) {
+        this.calculatedDatapoints[i] = { startTime: new Date(), averagePowerWatts: 0};
+      }
+    }
+
+    for (let i = 0; i < 48; i++) {
+      const solarWatts = this.solarEnabled ? this.solarDatapoints[i].averagePowerWatts : 0;
+      this.calculatedDatapoints[i].averagePowerWatts = this.datapoints[i].averagePowerWatts - solarWatts;
+      this.calculatedDatapoints[i].startTime = this.datapoints[i].startTime;
+    }
+    this.calculateRampRates();
+  }
+
+  calculateRampRates(): void {
     this.maxRampRateUp = 0;
     this.maxRampRateUpPercent = 0;
-    let last = datapoints[30].averagePowerWatts;
+    let last = this.calculatedDatapoints[30].averagePowerWatts;
     for (let i = 31; i < 41; i++) {
-      const temp = datapoints[i].averagePowerWatts - last;
+      const temp = this.calculatedDatapoints[i].averagePowerWatts - last;
       const tempUpPercent = temp / last;
       this.maxRampRateUp = Math.max(temp, this.maxRampRateUp);
       this.maxRampRateUpPercent = Math.max(tempUpPercent, this.maxRampRateUpPercent);
-      last = datapoints[i].averagePowerWatts;
+      last = this.calculatedDatapoints[i].averagePowerWatts;
     }
     this.maxRampRateUpPercent = Math.floor(this.maxRampRateUpPercent * 100);
 
     this.maxRampRateDown = 0;
     this.maxRampRateDownPercent = 0;
-    last = datapoints[12].averagePowerWatts;
+    last = this.calculatedDatapoints[12].averagePowerWatts;
     for (let i = 13; i < 23; i++) {
-      const temp = last - datapoints[i].averagePowerWatts;
+      const temp = last - this.calculatedDatapoints[i].averagePowerWatts;
       const tempDownPercent = temp / last;
       this.maxRampRateDown = Math.max(temp, this.maxRampRateDown);
       this.maxRampRateDownPercent = Math.max(tempDownPercent, this.maxRampRateDownPercent);
-      last = datapoints[i].averagePowerWatts;
+      last = this.calculatedDatapoints[i].averagePowerWatts;
     }
     this.maxRampRateDownPercent = Math.floor(this.maxRampRateDownPercent * 100);
   }
@@ -186,7 +209,7 @@ export class ExploreComponent implements OnInit {
           this.solarLinePoints = '';
           for (let i = 14; i < 39; i++){
             this.solarLinePoints +=
-              (i * 25 + 65) + ' ' + (490 - this.wattsToPixelsMonthly(this.solarDatapoints[i].averagePowerWatts)) + ',';
+              (i * 25 + 65) + ' ' + (282 - this.wattsToPixelsMonthly(this.solarDatapoints[i].averagePowerWatts)) + ',';
           }
           this.solarLinePoints = this.solarLinePoints.slice(0, -1);
         },

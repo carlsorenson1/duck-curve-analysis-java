@@ -14,7 +14,7 @@
   </div>
 
   <div class="headerblock">
-    <strong>Options</strong>: Apply sample solar generation <input type="checkbox" [checked]="solarEnabled" (change)="solarEnabled = !solarEnabled"/>
+    <strong>Options</strong>: Apply sample solar generation <input type="checkbox" [checked]="solarEnabled" (change)="solarEnabled = !solarEnabled; recalculateDatapoints();"/>
   </div>
 
   <br />
@@ -26,25 +26,29 @@
 
   <!-- Chart for monthly averages -->
   <div *ngIf='displayMode != "single";' style='margin-top: 10px;'>
-    <svg id='chart-container' viewBox="0 0 1255 550" font-family="Verdana" font-size='14'>
+    <svg id='chart-container' viewBox="0 0 1255 550" font-family="Verdana" font-size='12'>
       <!-- Horizontal axis -->
       <line x1="45" y1="490" x2="1250" y2="490" stroke-width="1" stroke="black"/>
       <!-- Vertical axis -->
       <line x1="45" y1="0" x2="45" y2="490" stroke-width="1" stroke="black"/>
       <!-- Vertical axis crossticks and labels -->
-      <line x1="45" [attr.y1]='490 - wattsToPixelsMonthly(1000)' x2="1255" [attr.y2]='490 - wattsToPixelsMonthly(1000)' stroke-width="1" stroke="black"/>
-      <line x1="45" [attr.y1]='490 - wattsToPixelsMonthly(2000)' x2="1255" [attr.y2]='490 - wattsToPixelsMonthly(2000)' stroke-width="1" stroke="black"/>
-      <line x1="45" [attr.y1]='490 - wattsToPixelsMonthly(3000)' x2="1255" [attr.y2]='490 - wattsToPixelsMonthly(3000)' stroke-width="1" stroke="black"/>
-      <line x1="45" [attr.y1]='490 - wattsToPixelsMonthly(4000)' x2="1255" [attr.y2]='490 - wattsToPixelsMonthly(4000)' stroke-width="1" stroke="black"/>
-      <line x1="45" [attr.y1]='490 - wattsToPixelsMonthly(5000)' x2="1255" [attr.y2]='490 - wattsToPixelsMonthly(5000)' stroke-width="1" stroke="black"/>
-      <text x='5' [attr.y]='493 - wattsToPixelsMonthly(1000)'>1 kW</text>
-      <text x='5' [attr.y]='493 - wattsToPixelsMonthly(2000)'>2 kW</text>
-      <text x='5' [attr.y]='493 - wattsToPixelsMonthly(3000)'>3 kW</text>
-      <text x='5' [attr.y]='493 - wattsToPixelsMonthly(4000)'>4 kW</text>
-      <text x='5' [attr.y]='493 - wattsToPixelsMonthly(5000)'>5 kW</text>
-      <ng-container *ngFor="let dp of datapoints; let i = index">
+      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(-2000)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(-2000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(-1000)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(-1000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(0)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(0)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(1000)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(1000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(2000)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(2000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(3000)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(3000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(4000)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(4000)' stroke-width="1" stroke="black"/>
+      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(-2000)'>-2 kW</text>
+      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(-1000)'>-1 kW</text>
+      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(0)'>0 kW</text>
+      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(1000)'>1 kW</text>
+      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(2000)'>2 kW</text>
+      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(3000)'>3 kW</text>
+      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(4000)'>4 kW</text>
+      <ng-container *ngFor="let dp of calculatedDatapoints; let i = index">
         <!-- Bar chart bars -->
-        <rect [attr.x]='i * 25 + 55' [attr.y]='490 - wattsToPixelsMonthly(dp.averagePowerWatts)' [attr.height]='wattsToPixelsMonthly(dp.averagePowerWatts)' width='20' fill='#6a8acc' shape-rendering='crispEdges'>
+        <rect [attr.x]='i * 25 + 55' [attr.y]='282 - max(wattsToPixelsMonthly(dp.averagePowerWatts),0)' [attr.height]='abs(wattsToPixelsMonthly(dp.averagePowerWatts))' width='20' fill='#6a8acc' shape-rendering='crispEdges'>
           <title>{{dp.averagePowerWatts + " Watts at " + (dp.startTime|date:"HH:mm")}}</title>
         </rect>
         <!-- Time labels -->
@@ -71,7 +75,7 @@
       <text x='5' [attr.y]='493 - wattsToPixelsSingle(5000)'>5 kW</text>
       <text x='0' [attr.y]='493 - wattsToPixelsSingle(10000)'>10 kW</text>
       <text x='0' [attr.y]='493 - wattsToPixelsSingle(15000)'>15 kW</text>
-      <ng-container *ngFor="let dp of datapoints; let i = index">
+      <ng-container *ngFor="let dp of calculatedDatapoints; let i = index">
         <!-- Bar chart bars -->
         <rect [attr.x]='i * 25 + 55' [attr.y]='490 - wattsToPixelsSingle(dp.averagePowerWatts)' [attr.height]='wattsToPixelsSingle(dp.averagePowerWatts)' width='20' fill='#6a8acc' shape-rendering='crispEdges'>
           <title>{{dp.averagePowerWatts + " Watts at " + (dp.startTime|date:"HH:mm")}}</title>
