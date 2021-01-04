@@ -40,3 +40,13 @@ tr:nth-child(even) {
 .faint {
   color: gray;
 }
+
+.toggle, .toggle input {
+  display: inline-block;
+  border: 1px solid gray;
+  border-radius: 3px;
+  padding: 5px;
+  margin: 5px;
+  cursor: pointer;
+}
+
