@@ -10,17 +10,23 @@ import java.time.ZoneId;
 import java.util.*;
 
 public class EmoncmsService {
-    private final Hashtable<Date, ArrayList<Sample>> dayCache = new Hashtable<>();
+    private final EnumMap<FeedType, Hashtable<Date, ArrayList<Sample>>> cache = new EnumMap<>(FeedType.class);
 
-    public ArrayList<Sample> getDayDatapoints(Date date) {
-        if (dayCache.containsKey(date)) {
-            return getDeepCopy(dayCache.get(date));
+    public EmoncmsService() {
+        for (FeedType feedType : FeedType.values()) {
+            cache.put(feedType, new Hashtable<>());
+        }
+    }
+
+    public ArrayList<Sample> getDayDatapoints(FeedType feedType, Date date) {
+        if (cache.get(feedType).containsKey(date)) {
+            return getDeepCopy(cache.get(feedType).get(date));
         }
 
         System.err.println(String.format("Cache entry not found for date %s", date));
 
         String apiKey = System.getenv("EMONCMS_API_KEY");
-        String feedId = System.getenv("FEED_ID_POWER_TOTAL");
+        String feedId = System.getenv("FEED_ID_POWER_" + feedType.toString());
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
@@ -79,7 +85,7 @@ public class EmoncmsService {
             e.printStackTrace();
         }
 
-        dayCache.put(date, dataPoints);
+        cache.get(feedType).put(date, dataPoints);
 
         return getDeepCopy(dataPoints);
     }

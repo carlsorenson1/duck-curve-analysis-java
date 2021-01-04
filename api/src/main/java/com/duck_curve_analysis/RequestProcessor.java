@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class RequestProcessor {
     private EmoncmsService emoncmsService = new EmoncmsService();
@@ -13,36 +14,44 @@ public class RequestProcessor {
     public void warmUp() {
         Date startDate = DateHelpers.parseDate("2020-10-01");
         Calendar cal = Calendar.getInstance();
-        cal.setTime(startDate);
         Date endDate = DateHelpers.parseDate("2020-12-31");
 
-        while (cal.getTime().getTime() < endDate.getTime()){
-            emoncmsService.getDayDatapoints(cal.getTime());
-            DateHelpers.addOneDay(cal);
+        for (FeedType feedType : FeedType.values()) {
+            cal.setTime(startDate);
+
+            while (cal.getTime().getTime() < endDate.getTime()){
+                emoncmsService.getDayDatapoints(feedType, cal.getTime());
+                DateHelpers.addOneDay(cal);
+            }
         }
     }
 
     public void handleApiCall(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pathInfo = request.getPathInfo();
         String[] parts = pathInfo.split("/");
-        String mode = parts[2];
+
+        if (parts[2].equals("solar")) {
+            writeOutSamples(SolarData.getSolarSamples(), response);
+            return;
+        }
+
+        FeedType feedType = FeedType.valueOf(parts[2].toUpperCase(Locale.ROOT));
+
+        String mode = parts[3];
 
         String dateString;
         Date parsedDate;
 
-        switch(mode){
-            case "solar":
-                writeOutSamples(SolarData.getSolarSamples(), response);
-                break;
+        switch(mode) {
             case "day":
-                dateString = parts[3];
+                dateString = parts[4];
                 parsedDate = DateHelpers.parseDate(dateString);
-                ArrayList<Sample> samples = emoncmsService.getDayDatapoints(parsedDate);
+                ArrayList<Sample> samples = emoncmsService.getDayDatapoints(feedType, parsedDate);
                 writeOutSamples(samples, response);
                 break;
             case "average":
-                String dayTypes = parts[3];
-                dateString = parts[4];
+                String dayTypes = parts[4];
+                dateString = parts[5];
                 parsedDate = DateHelpers.parseDate(dateString);
                 int daysIncluded = 1;
 
@@ -51,7 +60,7 @@ public class RequestProcessor {
                 int startMonth = cal.get(Calendar.MONTH);
 
                 // Initialize the workingSamples to zero watts, but with the date values
-                ArrayList<Sample> workingSamples = emoncmsService.getDayDatapoints(parsedDate);
+                ArrayList<Sample> workingSamples = emoncmsService.getDayDatapoints(feedType, parsedDate);
                 for (int i = 0; i < 48; i++) {
                     workingSamples.get(i).averagePowerWatts = 0;
                 }
@@ -73,7 +82,7 @@ public class RequestProcessor {
                     }
 
                     if (include) {
-                        ArrayList<Sample> temp = emoncmsService.getDayDatapoints(cal.getTime());
+                        ArrayList<Sample> temp = emoncmsService.getDayDatapoints(feedType, cal.getTime());
                         daysIncluded += 1;
                         for (int i = 0; i < 48; i++) {
                             workingSamples.get(i).averagePowerWatts += temp.get(i).averagePowerWatts;
