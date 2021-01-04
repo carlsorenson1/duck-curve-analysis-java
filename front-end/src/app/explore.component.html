@@ -19,71 +19,80 @@
 
   <br />
 
-  <!-- Legend -->
-  <div *ngIf='displayMode != "single";' style='margin: 15px 0;'>
-    The yellow line shows potential solar generation curve. Red line is an example duck curve.
-  </div>
-
   <!-- Chart for monthly averages -->
   <div *ngIf='displayMode != "single";' style='margin-top: 10px;'>
-    <svg id='chart-container' viewBox="0 0 1255 550" font-family="Verdana" font-size='12'>
+    <svg id='chart-container' viewBox="0 0 1255 620" font-family="Verdana" font-size='12'>
       <!-- Horizontal axis -->
-      <line x1="45" y1="490" x2="1250" y2="490" stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='xAxis' x2="1250" [attr.y2]='xAxis' stroke-width="1" stroke="black"/>
       <!-- Vertical axis -->
-      <line x1="45" y1="0" x2="45" y2="490" stroke-width="1" stroke="black"/>
+      <line x1="45" y1="0" x2="45" [attr.y2]='xAxis' stroke-width="1" stroke="black"/>
       <!-- Vertical axis crossticks and labels -->
-      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(-2000)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(-2000)' stroke-width="1" stroke="black"/>
-      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(-1000)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(-1000)' stroke-width="1" stroke="black"/>
-      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(0)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(0)' stroke-width="1" stroke="black"/>
-      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(1000)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(1000)' stroke-width="1" stroke="black"/>
-      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(2000)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(2000)' stroke-width="1" stroke="black"/>
-      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(3000)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(3000)' stroke-width="1" stroke="black"/>
-      <line x1="45" [attr.y1]='282 - wattsToPixelsMonthly(4000)' x2="1255" [attr.y2]='282 - wattsToPixelsMonthly(4000)' stroke-width="1" stroke="black"/>
-      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(-2000)'>-2 kW</text>
-      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(-1000)'>-1 kW</text>
-      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(0)'>0 kW</text>
-      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(1000)'>1 kW</text>
-      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(2000)'>2 kW</text>
-      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(3000)'>3 kW</text>
-      <text x='5' [attr.y]='285 - wattsToPixelsMonthly(4000)'>4 kW</text>
+      <line x1="45" [attr.y1]='monthlyZeroLine - wattsToPixelsMonthly(-2000)' x2="1255" [attr.y2]='monthlyZeroLine - wattsToPixelsMonthly(-2000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='monthlyZeroLine - wattsToPixelsMonthly(-1000)' x2="1255" [attr.y2]='monthlyZeroLine - wattsToPixelsMonthly(-1000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='monthlyZeroLine - wattsToPixelsMonthly(0)' x2="1255" [attr.y2]='monthlyZeroLine - wattsToPixelsMonthly(0)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='monthlyZeroLine - wattsToPixelsMonthly(1000)' x2="1255" [attr.y2]='monthlyZeroLine - wattsToPixelsMonthly(1000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='monthlyZeroLine - wattsToPixelsMonthly(2000)' x2="1255" [attr.y2]='monthlyZeroLine - wattsToPixelsMonthly(2000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='monthlyZeroLine - wattsToPixelsMonthly(3000)' x2="1255" [attr.y2]='monthlyZeroLine - wattsToPixelsMonthly(3000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='monthlyZeroLine - wattsToPixelsMonthly(4000)' x2="1255" [attr.y2]='monthlyZeroLine - wattsToPixelsMonthly(4000)' stroke-width="1" stroke="black"/>
+      <text x='5' [attr.y]='monthlyZeroLine - wattsToPixelsMonthly(-2000)'>-2 kW</text>
+      <text x='5' [attr.y]='monthlyZeroLine - wattsToPixelsMonthly(-1000)'>-1 kW</text>
+      <text x='5' [attr.y]='monthlyZeroLine - wattsToPixelsMonthly(0)'>0 kW</text>
+      <text x='5' [attr.y]='monthlyZeroLine - wattsToPixelsMonthly(1000)'>1 kW</text>
+      <text x='5' [attr.y]='monthlyZeroLine - wattsToPixelsMonthly(2000)'>2 kW</text>
+      <text x='5' [attr.y]='monthlyZeroLine - wattsToPixelsMonthly(3000)'>3 kW</text>
+      <text x='5' [attr.y]='monthlyZeroLine - wattsToPixelsMonthly(4000)'>4 kW</text>
       <ng-container *ngFor="let dp of calculatedDatapoints; let i = index">
         <!-- Bar chart bars -->
-        <rect [attr.x]='i * 25 + 55' [attr.y]='282 - max(wattsToPixelsMonthly(dp.averagePowerWatts),0)' [attr.height]='abs(wattsToPixelsMonthly(dp.averagePowerWatts))' width='20' fill='#6a8acc' shape-rendering='crispEdges'>
+        <rect [attr.x]='i * 25 + 55' [attr.y]='monthlyZeroLine - max(wattsToPixelsMonthly(dp.averagePowerWatts),0)' [attr.height]='abs(wattsToPixelsMonthly(dp.averagePowerWatts))' width='20' fill='#6a8acc' shape-rendering='crispEdges'>
           <title>{{dp.averagePowerWatts + " Watts at " + (dp.startTime|date:"HH:mm")}}</title>
         </rect>
         <!-- Time labels -->
-        <text *ngIf='i % 2 == 0' x="1" y="0" [attr.transform]="'translate(' + (i * 25 + 70) + ',540) rotate(-90)'" >
+        <text *ngIf='i % 2 == 0' x="1" y="0" [attr.transform]="'translate(' + (i * 25 + 70) + ',' + (xAxis + 50) + ') rotate(-90)'" >
           {{dp.startTime|date:"HH:mm"}}
         </text>
       </ng-container>
       <!-- Solar profile -->
-      <polyline *ngIf="solarEnabled" [attr.points]='solarLinePoints' fill='none' stroke='gold' stroke-width='4' ></polyline>
+      <polyline *ngIf="solarEnabled" [attr.points]='solarLinePointsMonthly' fill='none' stroke='gold' stroke-width='4' ></polyline>
     </svg>
   </div>
 
   <!-- Chart for one single day -->
   <div *ngIf='displayMode == "single";' style='margin-top: 10px;'>
-    <svg id='chart-container' viewBox="0 0 1255 550" font-family="Verdana" font-size='14'>
+    <svg id='chart-container' viewBox="0 0 1255 620" font-family="Verdana" font-size='12'>
       <!-- Horizontal axis -->
-      <line x1="45" y1="490" x2="1250" y2="490" stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='xAxis' x2="1250" [attr.y2]='xAxis' stroke-width="1" stroke="black"/>
       <!-- Vertical axis -->
-      <line x1="45" y1="0" x2="45" y2="490" stroke-width="1" stroke="black"/>
+      <line x1="45" y1="0" x2="45" [attr.y2]='xAxis' stroke-width="1" stroke="black"/>
       <!-- Vertical axis crossticks and labels -->
-      <line x1="45" [attr.y1]='490 - wattsToPixelsSingle(5000)' x2="1255" [attr.y2]='490 - wattsToPixelsSingle(5000)' stroke-width="1" stroke="black"/>
-      <line x1="45" [attr.y1]='490 - wattsToPixelsSingle(10000)' x2="1255" [attr.y2]='490 - wattsToPixelsSingle(10000)' stroke-width="1" stroke="black"/>
-      <line x1="45" [attr.y1]='490 - wattsToPixelsSingle(15000)' x2="1255" [attr.y2]='490 - wattsToPixelsSingle(15000)' stroke-width="1" stroke="black"/>
-      <text x='5' [attr.y]='493 - wattsToPixelsSingle(5000)'>5 kW</text>
-      <text x='0' [attr.y]='493 - wattsToPixelsSingle(10000)'>10 kW</text>
-      <text x='0' [attr.y]='493 - wattsToPixelsSingle(15000)'>15 kW</text>
+      <line x1="45" [attr.y1]='dailyZeroLine - wattsToPixelsSingle(-2000)' x2="1255" [attr.y2]='dailyZeroLine - wattsToPixelsSingle(-2000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='dailyZeroLine - wattsToPixelsSingle(0)' x2="1255" [attr.y2]='dailyZeroLine - wattsToPixelsSingle(0)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='dailyZeroLine - wattsToPixelsSingle(2000)' x2="1255" [attr.y2]='dailyZeroLine - wattsToPixelsSingle(2000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='dailyZeroLine - wattsToPixelsSingle(4000)' x2="1255" [attr.y2]='dailyZeroLine - wattsToPixelsSingle(4000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='dailyZeroLine - wattsToPixelsSingle(6000)' x2="1255" [attr.y2]='dailyZeroLine - wattsToPixelsSingle(6000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='dailyZeroLine - wattsToPixelsSingle(8000)' x2="1255" [attr.y2]='dailyZeroLine - wattsToPixelsSingle(8000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='dailyZeroLine - wattsToPixelsSingle(10000)' x2="1255" [attr.y2]='dailyZeroLine - wattsToPixelsSingle(10000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='dailyZeroLine - wattsToPixelsSingle(12000)' x2="1255" [attr.y2]='dailyZeroLine - wattsToPixelsSingle(12000)' stroke-width="1" stroke="black"/>
+      <line x1="45" [attr.y1]='dailyZeroLine - wattsToPixelsSingle(14000)' x2="1255" [attr.y2]='dailyZeroLine - wattsToPixelsSingle(14000)' stroke-width="1" stroke="black"/>
+      <text x='5' [attr.y]='dailyZeroLine - wattsToPixelsSingle(-2000)'>-2 kW</text>
+      <text x='5' [attr.y]='dailyZeroLine - wattsToPixelsSingle(0)'>0 kW</text>
+      <text x='5' [attr.y]='dailyZeroLine - wattsToPixelsSingle(2000)'>2 kW</text>
+      <text x='0' [attr.y]='dailyZeroLine - wattsToPixelsSingle(4000)'>4 kW</text>
+      <text x='0' [attr.y]='dailyZeroLine - wattsToPixelsSingle(6000)'>6 kW</text>
+      <text x='0' [attr.y]='dailyZeroLine - wattsToPixelsSingle(8000)'>8 kW</text>
+      <text x='0' [attr.y]='dailyZeroLine - wattsToPixelsSingle(10000)'>10 kW</text>
+      <text x='0' [attr.y]='dailyZeroLine - wattsToPixelsSingle(12000)'>12 kW</text>
+      <text x='0' [attr.y]='dailyZeroLine - wattsToPixelsSingle(14000)'>14 kW</text>
       <ng-container *ngFor="let dp of calculatedDatapoints; let i = index">
         <!-- Bar chart bars -->
-        <rect [attr.x]='i * 25 + 55' [attr.y]='490 - wattsToPixelsSingle(dp.averagePowerWatts)' [attr.height]='wattsToPixelsSingle(dp.averagePowerWatts)' width='20' fill='#6a8acc' shape-rendering='crispEdges'>
+        <rect [attr.x]='i * 25 + 55' [attr.y]='dailyZeroLine - max(wattsToPixelsSingle(dp.averagePowerWatts), 0)' [attr.height]='abs(wattsToPixelsSingle(dp.averagePowerWatts))' width='20' fill='#6a8acc' shape-rendering='crispEdges'>
           <title>{{dp.averagePowerWatts + " Watts at " + (dp.startTime|date:"HH:mm")}}</title>
         </rect>
         <!-- Time labels -->
-        <text *ngIf='i % 2 == 0' x="1" y="0" [attr.transform]="'translate(' + (i * 25 + 70) + ',540) rotate(-90)'" >
+        <text *ngIf='i % 2 == 0' x="1" y="0" [attr.transform]="'translate(' + (i * 25 + 70) + ',' + (xAxis + 50) + ') rotate(-90)'" >
           {{dp.startTime|date:"HH:mm"}}
         </text>
+        <!-- Solar profile -->
+        <polyline *ngIf="solarEnabled" [attr.points]='solarLinePointsDaily' fill='none' stroke='gold' stroke-width='4' ></polyline>
       </ng-container>
     </svg>
   </div>

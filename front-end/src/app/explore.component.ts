@@ -19,7 +19,8 @@ export class ExploreComponent implements OnInit {
   datapoints: IDatapoint[];
   calculatedDatapoints: IDatapoint[];
   solarDatapoints: IDatapoint[];
-  solarLinePoints: string;
+  solarLinePointsMonthly: string;
+  solarLinePointsDaily: string;
 
   maxRampRateDown: number;
   maxRampRateUp: number;
@@ -35,14 +36,15 @@ export class ExploreComponent implements OnInit {
     {value: 'single', text: 'Single days only'}
   ];
 
+  monthlyZeroLine = 350;
+  dailyZeroLine = 465;
+
+  xAxis = 558;
+
   onChangeDisplayMode(mode: string): void {
     this.log(mode);
     this.displayMode = mode;
     this.updateDatapoints();
-  }
-
-  getLineArray(): number[] {
-    return Array(15);
   }
 
   wattsToPixelsMonthly(watts: number, pxOffset: number = 0): number {
@@ -50,7 +52,7 @@ export class ExploreComponent implements OnInit {
   }
 
   wattsToPixelsSingle(watts: number, pxOffset: number = 0): number {
-    return watts / 40 + pxOffset;
+    return watts / 32 + pxOffset;
   }
 
   abs(value: number): number {
@@ -206,17 +208,20 @@ export class ExploreComponent implements OnInit {
     this.energyDataService.getSolarValues()
       .subscribe( solarValues => {
           this.solarDatapoints = solarValues;
-          this.solarLinePoints = '';
+          this.solarLinePointsMonthly = '';
+          this.solarLinePointsDaily = '';
           for (let i = 14; i < 39; i++){
-            this.solarLinePoints +=
-              (i * 25 + 65) + ' ' + (282 - this.wattsToPixelsMonthly(this.solarDatapoints[i].averagePowerWatts)) + ',';
+            this.solarLinePointsMonthly +=
+              (i * 25 + 65) + ' ' + (this.monthlyZeroLine - this.wattsToPixelsMonthly(this.solarDatapoints[i].averagePowerWatts)) + ',';
+            this.solarLinePointsDaily +=
+              (i * 25 + 65) + ' ' + (this.dailyZeroLine - this.wattsToPixelsSingle(this.solarDatapoints[i].averagePowerWatts)) + ',';
           }
-          this.solarLinePoints = this.solarLinePoints.slice(0, -1);
+          this.solarLinePointsMonthly = this.solarLinePointsMonthly.slice(0, -1);
+          this.solarLinePointsDaily = this.solarLinePointsDaily.slice(0, -1);
+          this.updateDatapoints();
         },
         error => {
           this.log(error);
         });
-
-    this.updateDatapoints();
   }
 }
