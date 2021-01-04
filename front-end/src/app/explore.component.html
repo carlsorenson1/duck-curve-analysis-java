@@ -14,7 +14,10 @@
   </div>
 
   <div class="headerblock">
-    <strong>Options</strong>: Apply sample solar generation <input type="checkbox" [checked]="solarEnabled" (change)="solarEnabled = !solarEnabled; recalculateDatapoints();"/>
+    <strong>Options</strong>: Apply simulated solar generation <input type="checkbox" [checked]="solarEnabled" (change)="solarEnabled = !solarEnabled; recalculateDatapoints();" style="margin-right: 15px;"/>
+    Include real data for:
+    Water heater <input type="checkbox" [checked]="waterHeaterEnabled" (change)="waterHeaterEnabled = !waterHeaterEnabled; recalculateDatapoints();"/>
+    Car <input type="checkbox" [checked]="carEnabled" (change)="carEnabled = !carEnabled; recalculateDatapoints();"/>
   </div>
 
   <br />
@@ -100,11 +103,11 @@
   <!-- Ramp rates -->
   <div style='margin: 15px 0;'>
     <h3>Ramp rates</h3>
+    <p>Half-hourly change in watts. Positive values are ramp up (increasing grid demand); negative values are ramp down (decreasing grid demand). The extreme values are greyed out because they appear to be less useful for understanding this dataset.</p>
     <table>
-      <thead>Maximum half-hourly change</thead>
-      <tr><th></th><th>Watts</th><th>Percent</th></tr>
-      <tr><td><span class="arrow">&#8595;</span> between 06:00 and 11:00</td><td>{{maxRampRateDown}}</td><td>{{maxRampRateDownPercent}}</td></tr>
-      <tr><td><span class="arrow">&#8593;</span> between 15:00 and 20:00</td><td>{{maxRampRateUp}}</td><td>{{maxRampRateUpPercent}}</td></tr>
+      <tr><th></th><th>Average</th><th>Median</th><th class="faint">Extreme</th></tr>
+      <tr><td><span class="arrow">&#8595;</span> between 06:00 and 11:00</td><td>{{rampRateDownAverage}}</td><td>{{rampRateDownMedian}}</td><td class="faint">{{rampRateDownExtreme}}</td></tr>
+      <tr><td><span class="arrow">&#8593;</span> between 15:00 and 20:00</td><td>{{rampRateUpAverage}}</td><td>{{rampRateUpMedian}}</td><td class="faint">{{rampRateUpExtreme}}</td></tr>
     </table>
 
   </div>

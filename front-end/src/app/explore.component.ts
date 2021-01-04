@@ -22,12 +22,17 @@ export class ExploreComponent implements OnInit {
   solarLinePointsMonthly: string;
   solarLinePointsDaily: string;
 
-  maxRampRateDown: number;
-  maxRampRateUp: number;
-  maxRampRateDownPercent: number;
-  maxRampRateUpPercent: number;
+  rampRateDownAverage: number;
+  rampRateDownMedian: number;
+  rampRateDownExtreme: number;
+
+  rampRateUpAverage: number;
+  rampRateUpMedian: number;
+  rampRateUpExtreme: number;
 
   solarEnabled = true;
+  waterHeaterEnabled = true;
+  carEnabled = true;
 
   displayModes = [
     {value: 'weekdays', text: 'Weekday average'},
@@ -162,29 +167,63 @@ export class ExploreComponent implements OnInit {
   }
 
   calculateRampRates(): void {
-    this.maxRampRateUp = 0;
-    this.maxRampRateUpPercent = 0;
+    const up: number[] = new Array<number>(10);
+    const down: number[] = new Array<number>(10);
+
     let last = this.calculatedDatapoints[30].averagePowerWatts;
     for (let i = 31; i < 41; i++) {
-      const temp = this.calculatedDatapoints[i].averagePowerWatts - last;
-      const tempUpPercent = temp / last;
-      this.maxRampRateUp = Math.max(temp, this.maxRampRateUp);
-      this.maxRampRateUpPercent = Math.max(tempUpPercent, this.maxRampRateUpPercent);
+      up[i - 31] = this.calculatedDatapoints[i].averagePowerWatts - last;
       last = this.calculatedDatapoints[i].averagePowerWatts;
     }
-    this.maxRampRateUpPercent = Math.floor(this.maxRampRateUpPercent * 100);
+    this.rampRateUpAverage = this.average(...up);
+    this.rampRateUpMedian = this.median(...up);
+    this.rampRateUpExtreme = this.extreme(...up);
 
-    this.maxRampRateDown = 0;
-    this.maxRampRateDownPercent = 0;
+
     last = this.calculatedDatapoints[12].averagePowerWatts;
     for (let i = 13; i < 23; i++) {
-      const temp = last - this.calculatedDatapoints[i].averagePowerWatts;
-      const tempDownPercent = temp / last;
-      this.maxRampRateDown = Math.max(temp, this.maxRampRateDown);
-      this.maxRampRateDownPercent = Math.max(tempDownPercent, this.maxRampRateDownPercent);
+      down[i - 13] = this.calculatedDatapoints[i].averagePowerWatts - last;
       last = this.calculatedDatapoints[i].averagePowerWatts;
     }
-    this.maxRampRateDownPercent = Math.floor(this.maxRampRateDownPercent * 100);
+    this.rampRateDownAverage = this.average(...down);
+    this.rampRateDownMedian = this.median(...down);
+    this.rampRateDownExtreme = this.extreme(...down);
+  }
+
+  extreme(...values: number[]): number {
+    let extreme = 0;
+    values.forEach(v => {
+      if (Math.abs(v) > Math.abs(extreme)) {
+        extreme = v;
+      }
+    });
+
+    return extreme;
+  }
+
+  average(...values: number[]): number {
+    let sum = 0;
+    values.forEach(v => {
+      sum += v;
+    });
+
+    return sum / values.length;
+  }
+
+  median(...values: number[]): number {
+    // The default sort is lexicographical.
+    values.sort((v1, v2) => {
+      if (v1 > v2) { return 1; }
+      if (v1 < v2) { return -1; }
+      return 0;
+    });
+
+    if (values.length % 2 === 0) {
+      return (values[values.length / 2 - 1] + values[values.length / 2]) / 2;
+    }
+    else {
+      return values[(values.length - 1) / 2];
+    }
   }
 
   log(message): void {
