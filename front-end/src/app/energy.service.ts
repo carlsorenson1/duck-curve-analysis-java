@@ -23,14 +23,14 @@ export class EnergyService {
     return this.http.get<IDatapoint[]>(url);
   }
 
-  getEnergyAverages(mode: string, selectedDate: Date): Observable<IDatapoint[]> {
-    const url = `${this.apiUrl}/average/${mode}/${this.zeroPad(selectedDate.getUTCFullYear())}-${this.zeroPad(selectedDate.getUTCMonth() + 1)}-${this.zeroPad(selectedDate.getUTCDate())}`
+  getEnergyAverages(feed: string, mode: string, selectedDate: Date): Observable<IDatapoint[]> {
+    const url = `${this.apiUrl}/${feed}/average/${mode}/${this.zeroPad(selectedDate.getUTCFullYear())}-${this.zeroPad(selectedDate.getUTCMonth() + 1)}-${this.zeroPad(selectedDate.getUTCDate())}`
     console.log(selectedDate, selectedDate.getDate());
     return this.http.get<IDatapoint[]>(url);
   }
 
-  getEnergyForDate(selectedDate: Date): Observable<IDatapoint[]> {
-    const url = `${this.apiUrl}/day/${this.zeroPad(selectedDate.getUTCFullYear())}-${this.zeroPad(selectedDate.getUTCMonth() + 1)}-${this.zeroPad(selectedDate.getUTCDate())}`
+  getEnergyForDate(feed: string, selectedDate: Date): Observable<IDatapoint[]> {
+    const url = `${this.apiUrl}/${feed}/day/${this.zeroPad(selectedDate.getUTCFullYear())}-${this.zeroPad(selectedDate.getUTCMonth() + 1)}-${this.zeroPad(selectedDate.getUTCDate())}`
     console.log(selectedDate, selectedDate.getDate());
     return this.http.get<IDatapoint[]>(url);
   }

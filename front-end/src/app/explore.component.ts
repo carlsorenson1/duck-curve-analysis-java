@@ -16,8 +16,12 @@ export class ExploreComponent implements OnInit {
 
   displayMode: string;
 
-  datapoints: IDatapoint[];
+  totalPowerDatapoints: IDatapoint[];
+  whDatapoints: IDatapoint[];
+  carDatapoints: IDatapoint[];
+  hvacDatapoints: IDatapoint[];
   calculatedDatapoints: IDatapoint[];
+
   solarDatapoints: IDatapoint[];
   solarLinePointsMonthly: string;
   solarLinePointsDaily: string;
@@ -33,6 +37,7 @@ export class ExploreComponent implements OnInit {
   solarEnabled = true;
   waterHeaterEnabled = true;
   carEnabled = true;
+  hvacEnabled = true;
 
   displayModes = [
     {value: 'weekdays', text: 'Weekday average'},
@@ -127,26 +132,86 @@ export class ExploreComponent implements OnInit {
     case 'weekdays':
     case 'weekends':
     case 'all':
-        this.energyDataService.getEnergyAverages(this.displayMode, this.currentMonth)
-        .subscribe( datapoints => {
-            this.datapoints = datapoints;
-            this.recalculateDatapoints();
-          },
+      if (!this.waterHeaterEnabled) {
+        this.energyDataService.getEnergyAverages('wh', this.displayMode, this.currentMonth)
+          .subscribe( datapoints => {
+              this.whDatapoints = datapoints;
+              this.recalculateDatapoints();
+            },
             error => {
               this.log(error);
-        });
-        break;
-    case 'single':
-        this.energyDataService.getEnergyForDate(this.currentDate)
-        .subscribe( datapoints => {
-            this.datapoints = datapoints;
-            this.recalculateDatapoints();
+            });
+      }
+      if (!this.carEnabled) {
+        this.energyDataService.getEnergyAverages('car', this.displayMode, this.currentMonth)
+          .subscribe( datapoints => {
+              this.carDatapoints = datapoints;
+              this.recalculateDatapoints();
+            },
+            error => {
+              this.log(error);
+            });
+      }
+      if (!this.hvacEnabled) {
+        this.energyDataService.getEnergyAverages('hvac', this.displayMode, this.currentMonth)
+          .subscribe( datapoints => {
+              this.hvacDatapoints = datapoints;
+              this.recalculateDatapoints();
+            },
+            error => {
+              this.log(error);
+            });
+      }
+      this.energyDataService.getEnergyAverages('total', this.displayMode, this.currentMonth)
+      .subscribe( datapoints => {
+          this.totalPowerDatapoints = datapoints;
+          this.recalculateDatapoints();
         },
           error => {
             this.log(error);
-          }
-        );
-        break;
+      });
+      break;
+    case 'single':
+      if (!this.waterHeaterEnabled) {
+        this.energyDataService.getEnergyForDate('wh', this.currentDate)
+          .subscribe( datapoints => {
+              this.whDatapoints = datapoints;
+              this.recalculateDatapoints();
+            },
+            error => {
+              this.log(error);
+            });
+      }
+      if (!this.carEnabled) {
+        this.energyDataService.getEnergyForDate('car', this.currentDate)
+          .subscribe( datapoints => {
+              this.carDatapoints = datapoints;
+              this.recalculateDatapoints();
+            },
+            error => {
+              this.log(error);
+            });
+      }
+      if (!this.hvacEnabled) {
+        this.energyDataService.getEnergyForDate('hvac', this.currentDate)
+          .subscribe( datapoints => {
+              this.hvacDatapoints = datapoints;
+              this.recalculateDatapoints();
+            },
+            error => {
+              this.log(error);
+            });
+      }
+      this.energyDataService.getEnergyForDate('total', this.currentDate)
+      .subscribe( datapoints => {
+          this.totalPowerDatapoints = datapoints;
+          this.recalculateDatapoints();
+      },
+        error => {
+          this.log(error);
+        }
+      );
+      break;
     }
   }
 
@@ -160,8 +225,20 @@ export class ExploreComponent implements OnInit {
 
     for (let i = 0; i < 48; i++) {
       const solarWatts = this.solarEnabled ? this.solarDatapoints[i].averagePowerWatts : 0;
-      this.calculatedDatapoints[i].averagePowerWatts = this.datapoints[i].averagePowerWatts - solarWatts;
-      this.calculatedDatapoints[i].startTime = this.datapoints[i].startTime;
+      this.calculatedDatapoints[i].averagePowerWatts = this.totalPowerDatapoints[i].averagePowerWatts - solarWatts;
+      this.calculatedDatapoints[i].startTime = this.totalPowerDatapoints[i].startTime;
+
+      if (!this.waterHeaterEnabled && this.whDatapoints != null) {
+        this.calculatedDatapoints[i].averagePowerWatts -= this.whDatapoints[i].averagePowerWatts;
+      }
+
+      if (!this.carEnabled && this.carDatapoints != null) {
+        this.calculatedDatapoints[i].averagePowerWatts -= this.carDatapoints[i].averagePowerWatts;
+      }
+
+      if (!this.hvacEnabled && this.hvacDatapoints != null) {
+        this.calculatedDatapoints[i].averagePowerWatts -= this.hvacDatapoints[i].averagePowerWatts;
+      }
     }
     this.calculateRampRates();
   }

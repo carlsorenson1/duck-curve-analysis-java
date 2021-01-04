@@ -16,8 +16,9 @@
   <div class="headerblock">
     <strong>Options</strong>: Apply simulated solar generation <input type="checkbox" [checked]="solarEnabled" (change)="solarEnabled = !solarEnabled; recalculateDatapoints();" style="margin-right: 15px;"/>
     Include real data for:
-    Water heater <input type="checkbox" [checked]="waterHeaterEnabled" (change)="waterHeaterEnabled = !waterHeaterEnabled; recalculateDatapoints();"/>
-    Car <input type="checkbox" [checked]="carEnabled" (change)="carEnabled = !carEnabled; recalculateDatapoints();"/>
+    Water heater <input type="checkbox" [checked]="waterHeaterEnabled" (change)="waterHeaterEnabled = !waterHeaterEnabled; updateDatapoints();"/>
+    Car <input type="checkbox" [checked]="carEnabled" (change)="carEnabled = !carEnabled; updateDatapoints();"/>
+    HVAC <input type="checkbox" [checked]="hvacEnabled" (change)="hvacEnabled = !hvacEnabled; updateDatapoints();"/>
   </div>
 
   <br />
