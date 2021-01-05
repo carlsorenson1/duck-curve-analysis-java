@@ -8,17 +8,19 @@ import { EnergyService } from './energy.service';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home.component';
 import { ExploreComponent } from './explore.component';
+import { ConclusionsComponent } from './conclusions.component';
 
 @NgModule({
   declarations: [
-    AppComponent, HomeComponent, ExploreComponent
+    AppComponent, HomeComponent, ExploreComponent, ConclusionsComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     RouterModule.forRoot([
+      { path: '', component: HomeComponent },
       { path: 'explore', component: ExploreComponent },
-      { path: '', component: HomeComponent }
+      { path: 'conclusions', component: ConclusionsComponent }
     ], { useHash: true })
   ],
   providers: [

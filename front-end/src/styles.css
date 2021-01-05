@@ -38,7 +38,7 @@ tr:nth-child(even) {
 }
 
 .faint {
-  color: gray;
+  color: #c0c0c0;
 }
 
 .toggle, .toggle input {
@@ -50,3 +50,6 @@ tr:nth-child(even) {
   cursor: pointer;
 }
 
+.external {
+  width: 12px;
+}

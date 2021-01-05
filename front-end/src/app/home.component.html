@@ -3,12 +3,11 @@
   <p>Electricity providers have traditionally had to manage peaks in electric use. On hot days there would be a peak in the afternoon as air conditioning caused high demand. There can also be peaks in the morning and early evening as people get ready for work or come home, turn on HVAC systems and lights, and cook dinner.
   </p>
   <p>The traditional pattern of peak demand is shifting in places where solar power is becoming significant. The midday peak can become the lowest net demand time period, as that's when the sun is shining. However, just as the solar power tapers off in the evening, people are arriving home and turning on appliances. This leads to a rapid rise in net electric demand, forming a curve that looks a bit like the profile of a duck sitting on water (orange line):</p>
-  <img src='duck_curve_wiki.png' />
+  <img src='../assets/duck_curve_wiki.png' height="400" />
   <p style='font-size: 0.8em;'>(Via Wikipedia, credit: ArnoldReinhold - Own work based on data from caiso.org, CC BY-SA 4.0, https://commons.wikimedia.org/w/index.php?curid=52529738)</p>
   <h4>Analyzing my data</h4>
   <p>On the next page, 'Explore the Data', you will find a tool to see <strong>real data</strong> about my electricity use at my house, collected using an IotaWatt home energy monitor. It shows the power used during each half-hour period of the day, averaged across a whole month so that we can see a trend. The superimposed solar generation curve (simulated data, yellow) is added so that we can see how well my personal electricity use matches the theory and how solar would impact the grid, given my electric load profile.</p>
   <p>This site uses a Java back end and an Angular/SVG front end, hosted with Elastic Beanstalk and S3. The Java back end provides an API that presents the data in a more useful way for the front end to consume - this includes calls to the emoncms service hosting my IotaWatt data, caching, and calculating the averages across full months.</p>
-  <a class='nav-link' [routerLink]="['explore']" style='font-size: 1.2em;'>Explore the data >>></a>
-  <br />
-  <a class='nav-link' href='https://github.com/carlsorenson1/duck-curve-analysis-java' style='font-size: 1.2em;'>Explore the source code >>></a>
+  <a class='nav-link' [routerLink]="['explore']" style='font-size: 1.2em;'>Explore the data</a>
+  <a class='nav-link' href='https://github.com/carlsorenson1/duck-curve-analysis-java' target="_blank" style='font-size: 1.2em;'>Explore the source code <img src="assets/external.png" class="external"></a>
 </main>
