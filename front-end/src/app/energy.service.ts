@@ -6,7 +6,7 @@ import { IDatapoint } from './datapoint';
 
 @Injectable()
 export class EnergyService {
-  private apiUrl = 'http://duck-curve-analysis-api.us-east-2.elasticbeanstalk.com/api';
+  private apiUrl = 'https://api.duck-curve-analysis.com/api';
 
   constructor(private http: HttpClient) { }
 

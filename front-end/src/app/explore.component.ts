@@ -310,11 +310,11 @@ export class ExploreComponent implements OnInit {
 
   ngOnInit(): void {
     this.log('initing');
-    this.currentDate = new Date('2020-12-31');
-    this.endDate = new Date('2020-12-31');
-    this.endMonth = new Date('2020-12-01');
+    this.currentDate = new Date('2021-01-31');
+    this.endDate = new Date('2021-01-31');
+    this.endMonth = new Date('2021-01-01');
 
-    this.currentMonth = new Date(this.endMonth.getTime());
+    this.currentMonth = new Date('2021-01-01');
     this.currentMonth.setUTCDate(1);
 
     this.startDate = new Date('2020-10-01');

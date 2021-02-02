@@ -14,7 +14,7 @@ public class RequestProcessor {
     public void warmUp() {
         Date startDate = DateHelpers.parseDate("2020-10-01");
         Calendar cal = Calendar.getInstance();
-        Date endDate = DateHelpers.parseDate("2020-12-31");
+        Date endDate = DateHelpers.parseDate("2021-01-31");
 
         for (FeedType feedType : FeedType.values()) {
             cal.setTime(startDate);
